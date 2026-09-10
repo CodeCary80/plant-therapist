@@ -7,11 +7,14 @@ export default defineConfig([
     files: ['**/*.{js,mjs,cjs}'],
     plugins: { js },
     extends: ['js/recommended'],
-    languageOptions: { globals: globals.node },
-    rules: {
-      'no-console': 'warn',
-      'prefer-const': 'error',
-    },
+    rules: { 'prefer-const': 'error' },
   },
-  { files: ['**/*.js'], languageOptions: { sourceType: 'commonjs' } },
+  {
+    files: ['src/**/*.js', 'drizzle.config.js'],
+    languageOptions: { globals: globals.node, sourceType: 'commonjs' },
+  },
+  {
+    files: ['public/**/*.js'],
+    languageOptions: { globals: globals.browser },
+  },
 ]);
