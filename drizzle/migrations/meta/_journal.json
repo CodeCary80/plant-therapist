@@ -8,6 +8,13 @@
       "when": 1789082565415,
       "tag": "0000_calm_mister_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789494933047,
+      "tag": "0001_daffy_killer_shrike",
+      "breakpoints": true
     }
   ]
 }
