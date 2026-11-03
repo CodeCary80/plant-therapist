@@ -59,6 +59,5 @@ app.post('/api/subscribers', async (req, res) => {
   }
 });
 
-
 Sentry.setupExpressErrorHandler(app);
 module.exports = app;
