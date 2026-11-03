@@ -4,6 +4,7 @@ const { join } = require('node:path');
 const validator = require('validator');
 const { getDb } = require('./db/index.js');
 const { subscribers } = require('./db/schema.js');
+const Sentry = require('@sentry/node');
 
 const app = express();
 const publicDir = join(__dirname, '..', 'public');
@@ -25,6 +26,7 @@ app.get('/health', async (req, res) => {
     });
   } catch (err) {
     console.error('Health check failed:', err);
+    Sentry.captureException(err);
 
     res.status(503).json({
       status: 'error',
@@ -52,8 +54,10 @@ app.post('/api/subscribers', async (req, res) => {
     res.sendStatus(200);
   } catch (err) {
     console.error(err);
+    Sentry.captureException(err);
     res.status(500).json({ error: 'Something went wrong.' });
   }
 });
 
+Sentry.setupExpressErrorHandler(app);
 module.exports = app;
