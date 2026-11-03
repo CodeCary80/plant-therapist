@@ -1,4 +1,5 @@
 require('dotenv/config');
+require('./instrument.js');
 const app = require('./app.js');
 
 const port = 3000;
