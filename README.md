@@ -2,13 +2,14 @@
 
 A "coming soon" landing page for **Plant Therapist** — emotional support tips for people who keep killing their houseplants. Visitors can drop their email to get notified at launch.
 
-The product concept is a placeholder. The real point of this repo is practicing a **full CI/CD pipeline**: automated tests, lint/format checks, Docker builds, database migrations, and automatic deployment on every push to `main`.
+The product concept is a placeholder. The real point of this repo is practicing a **full CI/CD pipeline**: automated tests, lint/format checks, Docker builds, database migrations, automatic deployment on every push to `main`, and error monitoring in production.
 
 ## What it actually does
 
 - Static landing page with an email signup form
 - `POST /api/subscribers` validates the email and stores it in Postgres, ignoring duplicates
 - `GET /health` checks database connectivity for uptime monitoring
+- Server errors are reported to [Sentry](https://sentry.io) with stack traces and email alerts
 - No confirmation or auto-reply emails are sent — submitted addresses are just stored in the database (viewable directly from the Neon dashboard) for manual follow-up later
 
 ## Tech stack
@@ -19,6 +20,7 @@ The product concept is a placeholder. The real point of this repo is practicing 
 - ESLint + Prettier
 - Docker
 - GitHub Actions → Docker Hub → Render
+- Sentry for error monitoring
 
 ## CI/CD pipeline
 
@@ -33,12 +35,32 @@ The product concept is a placeholder. The real point of this repo is practicing 
 2. Build and push a tagged Docker image to Docker Hub
 3. Trigger a Render deploy hook with the new image
 
+## Error monitoring
+
+CI catches problems before deploy; Sentry catches what gets through once the app is live.
+
+- `src/instrument.js` starts Sentry, and `src/server.js` loads it before the app
+- `Sentry.setupExpressErrorHandler` reports unhandled route errors
+- Routes that handle their own errors call `Sentry.captureException`, so those are reported too
+- Events are tagged by environment, so local errors stay separate from production ones
+
+Sentry only runs when `SENTRY_DSN` is set, so tests and CI don't send any events.
+
 ## Branches
 
 - `main` — the deployed pipeline
 - `cd-course` — where the CI/CD course exercises were worked through step by step, kept separate to keep `main`'s history clean
 
 ## Local development
+
+Create a `.env` file in the project root:
+
+```
+DATABASE_URL=your-postgres-connection-string
+SENTRY_DSN=your-sentry-dsn
+```
+
+`SENTRY_DSN` is optional; without it the app runs with Sentry turned off.
 
 ```bash
 npm install
